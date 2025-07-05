@@ -6,6 +6,7 @@ import { defineServerConfig } from '@genseki/react'
 
 import { foodsCollection } from './collections/foods'
 import { usersCollection } from './collections/users'
+import { postsCollection } from './collections/posts'
 import { baseConfig, builder } from './helper'
 
 const baseServerConfig = defineServerConfig(baseConfig, {
@@ -33,6 +34,7 @@ const baseServerConfig = defineServerConfig(baseConfig, {
   ],
   collections: {
     users: usersCollection,
+    posts: postsCollection,
     foods: foodsCollection,
   },
   endpoints: {

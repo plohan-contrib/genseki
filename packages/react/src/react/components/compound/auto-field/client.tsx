@@ -1,7 +1,7 @@
 'use client'
 
 import { type ReactNode, startTransition, useMemo } from 'react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext, type ControllerRenderProps, type FieldValues } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
 
@@ -188,27 +188,30 @@ export function AutoTimeField(
 
 interface AutoSelectField extends SelectProps<{}> {
   items: { value: string | number; label: string }[]
+  selectedKey?: string | number | null
 }
 
 export function AutoSelectField(props: AutoSelectField) {
   const { field, error } = useFormItemController()
 
+  const onSelectionChange = props.onSelectionChange || ((value) => {
+    if (value === null) return field.onChange(null)
+    const selectedItem = props.items?.find((item) => item.value === value)
+    if (selectedItem) {
+      field.onChange(selectedItem.value)
+    } else {
+      field.onChange(value)
+    }
+  })
+
   return (
     <Select
       {...field}
       {...props}
-      selectedKey={field.value}
+      selectedKey={props.selectedKey || field.value}
       className={cn('w-full', props.className)}
       errorMessage={error?.message}
-      onSelectionChange={(value) => {
-        if (value === null) return field.onChange(null)
-        const selectedItem = props.items?.find((item) => item.value === value)
-        if (selectedItem) {
-          field.onChange(selectedItem.value)
-        } else {
-          field.onChange(value)
-        }
-      }}
+      onSelectionChange={onSelectionChange}
     >
       <SelectTrigger className="h-auto" />
       <SelectList items={props.items}>
@@ -534,6 +537,10 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
     placeholder: props.field.placeholder,
   }
 
+  const items = props.optionsRecord[props.field.fieldName] ?? []
+
+  console.log({ field: props.field })
+
   const connectComponent = (
     <FormField
       name={props.name}
@@ -542,7 +549,21 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.field.fieldName] ?? []}
+            onSelectionChange={(value) => {
+              if (value === null) return field.onChange(null)
+              const selectedItem = items?.find((item) => item.value === value)
+              if (selectedItem) {
+                field.onChange({
+                  connect: selectedItem.value
+                })
+              } else {
+                field.onChange({
+                  connect: value
+                })
+              }
+            }}
+            selectedKey={field.value?.connect || ""}
+            items={items}
             isDisabled={disabled}
           />
         </FormItemController>

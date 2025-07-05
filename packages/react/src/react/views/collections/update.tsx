@@ -1,7 +1,7 @@
 import { CollectionFormLayout } from './layouts/collection-form-layout'
 import { UpdateClientView } from './update.client'
 
-import { Context, createAuth, type ServerConfig } from '../../../core'
+import { Context, createAuth, type AnyCollection, type ServerConfig } from '../../../core'
 import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
